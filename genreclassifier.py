@@ -249,25 +249,30 @@ def main():
   condprob = {}
   condprob = NaiveBayes_Training(mydict)
 
-  r = genreVectors(genres)
-  synopsis = sys.argv[1]
+  print 'Enter a query (format: \"<synopsis>\" <year> or quit to exit):'
+  query = raw_input()
+  while query != "quit":
+    queryString = re.split(r'[\"]', query)
+    i = 0
+    for elem in queryString:
+      if elem == '':
+        del queryString[i]
+      i += 1
+    if len(queryString) == 2:
+        r = genreVectors(genres)
+        synopsis = queryString[0]
+        mygenres = classify(r, condprob, synopsis)
+        directorScore = directorsRanking(training_dict, mygenres)
+        inputYear = queryString[1]
+        myBestDirectors = bestDirector(directorScore, inputYear, mygenres)
+        for item in myBestDirectors:
+          print item
 
-  mygenres = classify(r, condprob, synopsis)
-  print mygenres
-
-  directorScore = directorsRanking(training_dict, mygenres)
-
-
-  #for item in directorScore:
-  # print item, directorScore[item]
-
-  inputYear = sys.argv[2]
-
-  myBestDirectors = bestDirector(directorScore, inputYear, mygenres)
-
-  for item in myBestDirectors:
-    print item
-
+        print 'Enter a query:'
+        query = raw_input()
+    else:
+      print "Syntax Error: Please enter a query of the format: \"<synopsis>\" <year>:"
+      query = raw_input()
 
 if __name__ == '__main__':
   main()
